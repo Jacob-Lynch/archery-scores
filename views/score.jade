@@ -1,0 +1,60 @@
+extends layout
+
+block content
+    div.container
+        div.fs-title
+            h1 Scoring
+        section
+            form.simform#myform(autocomplete='off', action='score', method='get')
+                div.simform-inner
+                    ol.questions
+                        li
+                            span: label(for='name') What's your name?
+                            input#name(name='name', type='text', placeholder='Jacob', required='true', value=name)
+                        li
+                            span: label(for='shots') Number of shots in a round?
+                            input#shots(name='shots', type='number', placeholder='6', required='true', value=shots)
+                        li
+                            span: label(for='score') Score?
+                            input#score(name='score', type='number', placeholder='6', required='true')
+
+                    button.submit(type='submit') Send answers
+                    div.controls
+                        button.next
+                        <div class="progress"></div>
+                        span.number
+                            <span class="number-current"></span>
+                            <span class="number-total"></span>
+                        <span class="error-message"></span>
+        script.
+            (function () {
+                new stepsForm(document.getElementById('myform'), {
+                    onSubmit: function (form, errCb) {
+                        var req = new XMLHttpRequest();
+
+                        var showError = function() {
+                            errCb();
+                            var error = document.querySelector('.error-message');
+                            error.innerHTML = 'Error submitting result, please try again.';
+                            classie.addClass(error, 'show');
+                        };
+
+                        req.addEventListener('load', function(e) {
+                            if(e.currentTarget.status == 200) {
+                                form.submit();
+                            } else {
+                                showError();
+                            }
+                        });
+                        req.addEventListener('error', showError);
+                        req.addEventListener('abort', showError);
+
+                        var url = '#{url}';
+                        var name = document.getElementById('name').value;
+                        var shots = document.getElementById('shots').value;
+                        var score = document.getElementById('score').value;
+                        req.open('GET', url + `?Score=${score}&Shots=${shots}&Name=${name}`, true);
+                        req.send();
+                    }
+                });
+            })();

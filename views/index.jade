@@ -1,0 +1,41 @@
+extends layout
+
+<section>
+<form id="theForm" class="simform">
+<div class="simform-inner">
+<ol class="questions">
+<li>
+<span><label for="q1">What's your email?</label></span>
+<input id="q1" name="q1" type="email"/>
+</li>
+
+block content
+  div.container
+    div.fs-title
+      h1 Setup
+    section
+      form.simform#myform(autocomplete='off', action='score', method='get')
+        div.simform-inner
+          ol.questions
+            li
+              span: label(for='name') What's your name?
+              input#name(name='name', type='text', placeholder='Jacob', required='true')
+            li
+              span: label(for='shots') Number of shots in a round?
+              input#shots(name='shots', type='number', placeholder='6', required='true')
+          button.submit(type='submit') Send answers
+          div.controls
+            button.next
+            <div class="progress"></div>
+            span.number
+              <span class="number-current"></span>
+              <span class="number-total"></span>
+            <span class="error-message"></span>
+  script.
+    (function() {
+      new stepsForm(document.getElementById('myform'), {
+        onSubmit: function(form) {
+          form.submit();
+        }
+      });
+    })();
