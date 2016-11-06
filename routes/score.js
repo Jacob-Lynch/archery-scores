@@ -70,11 +70,11 @@ router.post('/', function(req, res, next) {
 });
 
 var formatDecimal = function(num) {
-  return num.toFixed(2);
+  return isNaN(num) ? '--' : num.toFixed(2);
 };
 
 var formatTime = function(sec) {
-  if(isNaN(sec)) return '';
+  if(isNaN(sec) || sec == 0) return '--';
   var sec_num = parseInt(sec, 10); // don't forget the second param
   var hours   = Math.floor(sec_num / 3600);
   var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
