@@ -29,9 +29,9 @@ router.get('/reconfig', function(req, res, next) {
   res.redirect('/');
 });
 
-var submitScore = function(score, shots, name) {
+var submitScore = function(score, shots, name, time) {
   return function() {
-    request.get(process.env.FORM_URL + '?Score=' + score + '&Shots=' + shots + '&Name=' + name);
+    request.get(process.env.FORM_URL + '?Score=' + score + '&Shots=' + shots + '&Name=' + name + '&Round Time=' + time);
   }
 };
 
@@ -62,9 +62,12 @@ router.post('/', function(req, res, next) {
     var stats = req.db.collection('stat');
     stats.insert({cookie: req.session.cookie, name: req.session.name, shots: parseInt(req.session.shots), score: parseInt(req.body.score), time: new Date()}, function(err, results) {
       //console.log('new score', results);
-      var result = results[0];
-      _.defer(submitScore(result.score, result.shots, result.name));
-      renderScore(res, req.session.name, req.session.shots);
+      getStats(req, function(allStats) {
+        var result = results[0];
+        var roundTime = formatTime(getRoundTime(result, req.session.start, allStats, allStats.length-1) / 1000);
+        _.defer(submitScore(result.score, result.shots, result.name, roundTime));
+        renderScore(res, req.session.name, req.session.shots);
+      });
     });
   }
 });
@@ -86,14 +89,24 @@ var formatTime = function(sec) {
   return hours+':'+minutes+':'+seconds;
 };
 
-router.get('/stats', requireSession, function(req, res, next) {
+var getStats = function(req, cb) {
   var stats = req.db.collection('stat');
   stats.find({cookie: req.session.cookie}).toArray(function(err, allStats) {
+    cb(allStats);
+  });
+};
+
+var getRoundTime = function(stat, start, allStats, i) {
+  return i == 0 ? stat.time - start : stat.time - allStats[i - 1].time;
+};
+
+router.get('/stats', requireSession, function(req, res, next) {
+  getStats(req, function(allStats) {
     var totalShots = 0, totalScore = 0, totalMs = 0;
-    allStats.forEach(function(stat, i) {
+    allStats.forEach(function (stat, i) {
       totalShots += stat.shots;
       totalScore += stat.score;
-      totalMs += i == 0 ? stat.time - req.session.start : stat.time - allStats[i-1].time;
+      totalMs += getRoundTime(stat, req.session.start, allStats, i);
     });
     res.render('stats', {
       totalShots: totalShots,
