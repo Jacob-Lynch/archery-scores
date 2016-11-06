@@ -1,9 +1,10 @@
 var express = require('express');
 var uuid = require('uuid');
+var _ = require('lodash');
+var request = require('request');
 var router = express.Router();
 
 var renderScore = function(res, name, shots) {
-  console.log('rendering score', name, shots);
   res.render('score', { name: name, shots: shots, url: process.env.FORM_URL });
 };
 
@@ -18,11 +19,22 @@ router.get('/', requireSession, function(req, res, next) {
   renderScore(res, req.session.name, req.session.shots);
 });
 
+var submitScore = function(score, shots, name) {
+  console.log('ss', score, shots, name);
+  return function() {
+    console.log('ss2', score, shots, name);
+    request.get(process.env.FORM_URL + '?Score=' + score + '&Shots=' + shots + '&Name=' + name);
+  }
+};
+
 router.post('/', function(req, res, next) {
   // if no cookie, generate cookie
   var cookie = req.cookies.session;
   var configs = req.db.collection('config');
   if(!cookie || !req.session) {
+    if(!req.body.name || !req.body.shots) {
+      return res.redirect('/');
+    }
     // generate a new cookie and save config to DB
     var session = uuid.v1();
     configs.insert({cookie: session, name: req.body.name, shots: parseInt(req.body.shots), start: new Date()}, function(err, result) {
@@ -40,8 +52,10 @@ router.post('/', function(req, res, next) {
   } else if(req.body.score) {
     // keep track of scores for this session so we can show stats
     var stats = req.db.collection('stat');
-    stats.insert({cookie: req.session.cookie, name: req.session.name, shots: parseInt(req.session.shots), score: parseInt(req.body.score), time: new Date()}, function(err, result) {
-      console.log('new score', result);
+    stats.insert({cookie: req.session.cookie, name: req.session.name, shots: parseInt(req.session.shots), score: parseInt(req.body.score), time: new Date()}, function(err, results) {
+      //console.log('new score', results);
+      var result = results[0];
+      _.defer(submitScore(result.score, result.shots, result.name));
       renderScore(res, req.session.name, req.session.shots);
     });
   }

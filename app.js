@@ -38,7 +38,7 @@ app.use(function(req, res, next) {
   if(req.cookies.session) {
     req.db.collection('config').findOne({cookie: req.cookies.session}, function(err, session) {
       if(!err && session) {
-        console.log('found session', session);
+        //console.log('found session', session);
         req.session = session;
       }
       next();

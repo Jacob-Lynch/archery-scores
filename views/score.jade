@@ -26,31 +26,7 @@ block content
             (function () {
                 new stepsForm(document.getElementById('myform'), {
                     onSubmit: function (form, errCb) {
-                        var req = new XMLHttpRequest();
-
-                        var showError = function() {
-                            errCb();
-                            var error = document.querySelector('.error-message');
-                            error.innerHTML = 'Error submitting result, please try again.';
-                            classie.addClass(error, 'show');
-                        };
-
-                        req.addEventListener('load', function(e) {
-                            if(e.currentTarget.status == 200) {
-                                form.submit();
-                            } else {
-                                showError();
-                            }
-                        });
-                        req.addEventListener('error', showError);
-                        req.addEventListener('abort', showError);
-
-                        var url = '#{url}';
-                        var shots = '#{shots}';
-                        var name = '#{name}';
-                        var score = document.getElementById('score').value;
-                        req.open('GET', url + `?Score=${score}&Shots=${shots}&Name=${name}`, true);
-                        req.send();
+                        form.submit();
                     }
                 });
 
