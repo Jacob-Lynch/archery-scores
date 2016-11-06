@@ -4,11 +4,15 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var compression = require('compression')
+var Db = require('tingodb')({memStore: true}).Db;
 
 var index = require('./routes/index');
 var score = require('./routes/score');
 
 var app = express();
+
+app.use(compression());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -21,6 +25,28 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// setup db, make available to requests
+var db = new Db('/some/local/path', {});
+app.use(function(req, res, next) {
+  req.db = db;
+  next();
+});
+
+// set session info, if available
+app.use(function(req, res, next) {
+  if(req.cookies.session) {
+    req.db.collection('config').findOne({cookie: req.cookies.session}, function(err, session) {
+      if(!err && session) {
+        console.log('found session', session);
+        req.session = session;
+      }
+      next();
+    });
+  } else {
+    next();
+  }
+});
 
 app.use('/', index);
 app.use('/score', score);
