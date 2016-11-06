@@ -329,8 +329,9 @@ input[type=text]::-ms-clear {
 	}
 }
 
-.stats, .back {
+.stats, .back, .reset, .reconfig {
 	cursor: pointer;
+	display: inline-block;
 }
 
 .stat {

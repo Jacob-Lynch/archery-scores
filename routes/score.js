@@ -19,10 +19,18 @@ router.get('/', requireSession, function(req, res, next) {
   renderScore(res, req.session.name, req.session.shots);
 });
 
+
+router.get('/reset', function(req, res, next) {
+  res.clearCookie('session');
+  res.redirect('/');
+});
+
+router.get('/reconfig', function(req, res, next) {
+  res.redirect('/');
+});
+
 var submitScore = function(score, shots, name) {
-  console.log('ss', score, shots, name);
   return function() {
-    console.log('ss2', score, shots, name);
     request.get(process.env.FORM_URL + '?Score=' + score + '&Shots=' + shots + '&Name=' + name);
   }
 };

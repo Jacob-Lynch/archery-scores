@@ -20,8 +20,12 @@ block content
                             <span class="number-current"></span>
                             <span class="number-total"></span>
                         <span class="error-message"></span>
-        div.fs-title
-            h3.stats Stats
+        div.stats
+            h3 Stats
+        div.reset
+            h3 Reset
+        div.reconfig
+            h3 Reconfigure
         script.
             (function () {
                 new stepsForm(document.getElementById('myform'), {
@@ -30,7 +34,13 @@ block content
                     }
                 });
 
-                document.querySelector('h3.stats').addEventListener('click', function() {
+                document.querySelector('div.stats').addEventListener('click', function() {
                     window.location = '/score/stats';
+                });
+                document.querySelector('div.reset').addEventListener('click', function () {
+                    window.location = '/score/reset';
+                });
+                document.querySelector('div.reconfig').addEventListener('click', function () {
+                    window.location = '/score/reconfig';
                 });
             })();
