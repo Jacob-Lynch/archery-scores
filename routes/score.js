@@ -47,6 +47,23 @@ router.post('/', function(req, res, next) {
   }
 });
 
+var formatDecimal = function(num) {
+  return num.toFixed(2);
+};
+
+var formatTime = function(sec) {
+  if(isNaN(sec)) return '';
+  var sec_num = parseInt(sec, 10); // don't forget the second param
+  var hours   = Math.floor(sec_num / 3600);
+  var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+  var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+  if (hours   < 10) {hours   = "0"+hours;}
+  if (minutes < 10) {minutes = "0"+minutes;}
+  if (seconds < 10) {seconds = "0"+seconds;}
+  return hours+':'+minutes+':'+seconds;
+};
+
 router.get('/stats', requireSession, function(req, res, next) {
   var stats = req.db.collection('stat');
   stats.find({cookie: req.session.cookie}).toArray(function(err, allStats) {
@@ -55,15 +72,16 @@ router.get('/stats', requireSession, function(req, res, next) {
       totalShots += stat.shots;
       totalScore += stat.score;
       totalMs += i == 0 ? stat.time - req.session.start : stat.time - allStats[i-1].time;
-    })
-    console.log('total shots', totalShots);
-    console.log('total score', totalScore);
-    console.log('total rounds', allStats.length);
-    console.log('total time', totalMs);
-    console.log('average score', totalScore / allStats.length);
-    console.log('average shots', totalShots / allStats.length);
-    console.log('average round time', totalMs / allStats.length);
-    res.redirect('/score');
+    });
+    res.render('stats', {
+      totalShots: totalShots,
+      avgScore: formatDecimal(totalScore / allStats.length),
+      avgRoundTime: formatTime(totalMs / allStats.length / 1000),
+      totalRounds: allStats.length,
+      totalTime: formatTime(totalMs / 1000),
+      totalScore: totalScore,
+      avgShots: formatDecimal(totalShots / allStats.length)
+    });
   });
 });
 

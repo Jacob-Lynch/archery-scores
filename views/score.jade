@@ -20,6 +20,8 @@ block content
                             <span class="number-current"></span>
                             <span class="number-total"></span>
                         <span class="error-message"></span>
+        div.fs-title
+            h3.stats Stats
         script.
             (function () {
                 new stepsForm(document.getElementById('myform'), {
@@ -50,5 +52,9 @@ block content
                         req.open('GET', url + `?Score=${score}&Shots=${shots}&Name=${name}`, true);
                         req.send();
                     }
+                });
+
+                document.querySelector('h3.stats').addEventListener('click', function() {
+                    window.location = '/score/stats';
                 });
             })();

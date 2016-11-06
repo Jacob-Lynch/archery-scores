@@ -1,0 +1,39 @@
+extends layout
+
+block content
+    div.fs-title
+        h3.back Back
+    div.stat
+        div
+            h2 Total Shots
+            h3= totalShots
+    div.stat
+        div
+            h2 Avg Score
+            h3= avgScore
+    div.stat
+        div
+            h2 Avg Time
+            h3= avgRoundTime
+    div.stat
+        div
+            h2 Total Rounds
+            h3= totalRounds
+    div.stat
+        div
+            h2 Total Time
+            h3= totalTime
+    div.stat
+        div
+            h2 Total Score
+            h3= totalScore
+    div.stat
+        div
+            h2 Avg Shots
+            h3= avgShots
+    script.
+        (function () {
+            document.querySelector('h3.back').addEventListener('click', function () {
+                window.location = '/score';
+            });
+        })();

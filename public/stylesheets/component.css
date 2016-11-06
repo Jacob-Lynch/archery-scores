@@ -328,3 +328,32 @@ input[type=text]::-ms-clear {
 		font-size: 1.2em;
 	}
 }
+
+.stats, .back {
+	cursor: pointer;
+}
+
+.stat {
+	float: left;
+	width: 50%;
+	text-align: center;
+	padding: 0.5em;
+}
+
+.stat h2, .stat h3 {
+	margin: 0;
+}
+
+.stat h2 {
+	text-decoration: underline;
+}
+
+.stat h3 {
+	margin-top: 2em;
+	margin-bottom: 1em;
+}
+
+.stat > div {
+	background-color: #8cd974;
+	padding: 1em;
+}
