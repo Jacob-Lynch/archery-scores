@@ -102,11 +102,13 @@ var getRoundTime = function(stat, start, allStats, i) {
 
 router.get('/stats', requireSession, function(req, res, next) {
   getStats(req, function(allStats) {
-    var totalShots = 0, totalScore = 0, totalMs = 0;
+    var totalShots = 0, totalScore = 0, totalMs = 0, bestRound = 0, worstRound = 100;
     allStats.forEach(function (stat, i) {
       totalShots += stat.shots;
       totalScore += stat.score;
       totalMs += getRoundTime(stat, req.session.start, allStats, i);
+      bestRound = Math.max(bestRound, stat.score);
+      worstRound = Math.min(worstRound, stat.score);
     });
     res.render('stats', {
       totalShots: totalShots,
@@ -115,7 +117,9 @@ router.get('/stats', requireSession, function(req, res, next) {
       totalRounds: allStats.length,
       totalTime: formatTime(totalMs / 1000),
       totalScore: totalScore,
-      avgShots: formatDecimal(totalShots / allStats.length)
+      avgShots: formatDecimal(totalShots / allStats.length),
+      bestRound: allStats.length > 0 ? bestRound : '--',
+      worstRound: allStats.length > 0 ? worstRound : '--'
     });
   });
 });
